@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
-import { useForm, Controller } from 'react-hook-form';
 import { Grid, TextField, Button, Card, CardContent, Typography } from '@material-ui/core';
- import { yupResolver } from '@hookform/resolvers/yup';
  import * as Yup from 'yup';
+ import { useFormik } from 'formik';
+
 
 
 function App() {
@@ -21,17 +21,19 @@ function App() {
       .oneOf([Yup.ref('password'), null], 'Confirm Password does not match'),
   });
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors }
-  } = useForm({
-    resolver: yupResolver(validationSchema)
+  const formik = useFormik({
+    initialValues: {
+      fullname:'',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
   });
-  const onSubmit = data => {
-    console.log(JSON.stringify(data, null, 2));
-  };
+
 
   return (
     <div className="App"> 
@@ -41,7 +43,7 @@ function App() {
       <Grid>
         <Card className="login">
           <CardContent>
-            <form>
+            <form onSubmit={formik.handleSubmit}>
               <Grid container spacing={1}>
                 <Grid xs={12} item>
                   <Typography align="left" style={{ margin:5}}>Full Name</Typography>
@@ -51,13 +53,12 @@ function App() {
                   placeholder="Mei Lee"
                    variant="outlined" 
                    fullWidth required
+                   value={formik.values.fullname}
+                   onChange={formik.handleChange}
+                   error={formik.touched.fullname && Boolean(formik.values.fullname)}
+                   helperText={formik.touched.fullname && formik.errors.fullname}
 
-                   {...register('fullname')}
-                   error={errors.fullname ? true : false}
                     />
-                    <Typography variant="inherit" color="textSecondary">
-                {errors.fullname?.message}
-              </Typography>
                 </Grid>
                 <Grid item xs={12}>
                 <Typography align="left" style={{ margin:5}}>Email</Typography>
@@ -68,13 +69,13 @@ function App() {
                    placeholder="mei.lee@mail.com"  
                    variant="outlined" 
                    fullWidth required 
-                   
-                   {...register('email')}
-                   error={errors.email ? true : false}
+                   value={formik.values.email}
+                   onChange={formik.handleChange}
+                   error={formik.touched.email && Boolean(formik.errors.email)}
+                   helperText={formik.touched.email && formik.errors.email}
+                 
                  />
-                 <Typography variant="inherit" color="textSecondary">
-                   {errors.email?.message}
-                 </Typography>
+                
                 </Grid>
                 <Grid item xs={12}>
                 <Typography align="left" style={{ margin:5}}>Password</Typography>
@@ -86,13 +87,13 @@ function App() {
                   placeholder="Enter password"  
                   variant="outlined" 
                   fullWidth required 
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  error={formik.touched.password && Boolean(formik.errors.password)}
+                   helperText={formik.touched.password && formik.errors.password}
                   
-                  {...register('password')}
-                  error={errors.password ? true : false}
                 />
-                <Typography variant="inherit" color="textSecondary">
-                  {errors.password?.message}
-                </Typography>
+              
                 </Grid>
                 <Grid item xs={12}>
                 <Typography align="left" style={{ margin:5}}>Confirm Password</Typography>
@@ -104,19 +105,17 @@ function App() {
                    placeholder="Enter confirm password" 
                     variant="outlined"
                      fullWidth required 
-
-                     {...register('confirmPassword')}
-                     error={errors.confirmPassword ? true : false}
+                     value={formik.values.confirmPassword}
+                   onChange={formik.handleChange}
+                  error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                  helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                    />
-                   <Typography variant="inherit" color="textSecondary">
-                     {errors.confirmPassword?.message}
-                   </Typography>
+                   
                 </Grid>
                 
                 <Grid item xs={12}>
                   <Button 
                   style={{ marginTop: 20}}
-                  onClick={handleSubmit(onSubmit)}
                   type="submit" 
                   variant="contained"
                    color="primary" 
